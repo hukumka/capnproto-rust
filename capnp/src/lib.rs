@@ -101,13 +101,8 @@ impl Word {
     /// Does this, but faster:
     /// `::std::iter::repeat(Word(0)).take(length).collect()`
     pub fn allocate_zeroed_vec(length: usize) -> Vec<Word> {
-        let mut result : Vec<Word> = Vec::with_capacity(length);
-        unsafe {
-            result.set_len(length);
-            let p : *mut u8 = result.as_mut_ptr() as *mut u8;
-            ::std::ptr::write_bytes(p, 0u8, length * ::std::mem::size_of::<Word>());
-        }
-        result
+        let zero = Word{raw_content: 0};
+        vec![zero; length]
     }
 
     /// Converts a byte slice into a `Word` slice. Unsafe due to possible alignment issues.
