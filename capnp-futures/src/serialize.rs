@@ -357,6 +357,8 @@ enum InnerWriteState {
         /// The byte offset into the next segment to write.
         idx: usize,
     },
+
+    Flush
 }
 
 impl InnerWriteState {
@@ -408,7 +410,15 @@ impl InnerWriteState {
                         }
                     }
 
-                    return Ok(Async::Ready(()))
+                    InnerWriteState::Flush
+                }
+                InnerWriteState::Flush => {
+                    match writer.flush(){
+                        Ok(_) => {return Ok(Async::Ready(()))},
+                        Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {return Ok(Async::NotReady)},
+                        Err(ref e) if e.kind() == io::ErrorKind::Interrupted => InnerWriteState::Flush,
+                        Err(e) => {return Err(e)}
+                    }
                 }
             };
 

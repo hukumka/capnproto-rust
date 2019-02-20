@@ -144,7 +144,7 @@ impl UseScratch {
 }
 
 impl <'a> Scratch<'a> for UseScratch {
-    type Allocator = message::ScratchSpaceHeapAllocator<'a, 'a>;
+    type Allocator = message::ScratchSpaceHeapAllocator<'a>;
 
     fn get_builders(&'a mut self) -> (message::Builder<Self::Allocator>, message::Builder<Self::Allocator>) {
         (message::Builder::new(message::ScratchSpaceHeapAllocator::new(

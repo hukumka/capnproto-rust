@@ -61,12 +61,12 @@ fn try_main(args: Vec<String>) -> Result<(), ::capnp::Error> {
     let mut runtime = ::tokio::runtime::current_thread::Runtime::new().unwrap();
 
     let addr = args[2].to_socket_addrs()?.next().expect("could not parse address");
-    let stream = runtime.block_on(::tokio::net::TcpStream::connect(&addr)).unwrap();
+    let stream = runtime.block_on(tokio::net::TcpStream::connect(&addr)).unwrap();
     stream.set_nodelay(true)?;
     let (reader, writer) = stream.split();
 
     let network =
-        Box::new(twoparty::VatNetwork::new(reader, writer,
+        Box::new(twoparty::VatNetwork::new(reader, std::io::BufWriter::new(writer),
                                            rpc_twoparty_capnp::Side::Client,
                                            Default::default()));
     let mut rpc_system = RpcSystem::new(network, None);
