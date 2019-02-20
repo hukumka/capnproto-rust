@@ -450,31 +450,31 @@ impl <'a> ScratchSpace<'a> {
     }
 }
 
-pub struct ScratchSpaceHeapAllocator<'a, 'b: 'a> {
-    scratch_space: &'a mut ScratchSpace<'b>,
+pub struct ScratchSpaceHeapAllocator<'a> {
+    scratch_space: &'a mut ScratchSpace<'a>,
     allocator: HeapAllocator,
 }
 
-impl <'a, 'b: 'a> ScratchSpaceHeapAllocator<'a, 'b> {
-    pub fn new(scratch_space: &'a mut ScratchSpace<'b>) -> ScratchSpaceHeapAllocator<'a, 'b> {
+impl <'a> ScratchSpaceHeapAllocator<'a> {
+    pub fn new(scratch_space: &'a mut ScratchSpace<'a>) -> ScratchSpaceHeapAllocator<'a> {
         ScratchSpaceHeapAllocator { scratch_space: scratch_space,
                                     allocator: HeapAllocator::new()}
     }
 
-    pub fn second_segment_words(self, value: u32) -> ScratchSpaceHeapAllocator<'a, 'b> {
+    pub fn second_segment_words(self, value: u32) -> ScratchSpaceHeapAllocator<'a> {
         ScratchSpaceHeapAllocator { scratch_space: self.scratch_space,
                                     allocator: self.allocator.first_segment_words(value) }
 
     }
 
-    pub fn allocation_strategy(self, value: AllocationStrategy) -> ScratchSpaceHeapAllocator<'a, 'b> {
+    pub fn allocation_strategy(self, value: AllocationStrategy) -> ScratchSpaceHeapAllocator<'a> {
         ScratchSpaceHeapAllocator { scratch_space: self.scratch_space,
                                     allocator: self.allocator.allocation_strategy(value) }
     }
 
 }
 
-unsafe impl <'a, 'b: 'a> Allocator for ScratchSpaceHeapAllocator<'a, 'b> {
+unsafe impl <'a> Allocator for ScratchSpaceHeapAllocator<'a> {
     fn allocate_segment(&mut self, minimum_size: u32) -> (*mut Word, u32) {
         if !self.scratch_space.in_use {
             self.scratch_space.in_use = true;
